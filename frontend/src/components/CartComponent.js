@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { useCart } from 'react-use-cart';
 import { FiShoppingCart, FiX, FiPlus, FiMinus, FiArrowLeft } from 'react-icons/fi';
 
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://electromart-l51h.onrender.com";
+
 const CartPage = () => {
   const { 
     items, 
@@ -18,6 +21,7 @@ const CartPage = () => {
       <div className="row">
         <div className="col-lg-8 mx-auto">
           <div className="card shadow-sm border-0">
+            {/* Header */}
             <div className="card-header bg-white border-bottom py-3">
               <div className="d-flex align-items-center justify-content-between">
                 <h2 className="h5 mb-0 fw-bold">
@@ -30,6 +34,7 @@ const CartPage = () => {
               </div>
             </div>
 
+            {/* Cart Items */}
             <div className="card-body p-0">
               {items.length === 0 ? (
                 <div className="text-center py-5">
@@ -48,8 +53,9 @@ const CartPage = () => {
                     {items.map((item) => (
                       <div key={item.id} className="list-group-item py-3 px-4">
                         <div className="d-flex align-items-center">
+                          {/* ✅ Use API_BASE_URL for images */}
                           <img
-                            src= {`http://localhost:5000${item.imageUrl}`}
+                            src={`${API_BASE_URL}${item.imageUrl}`}
                             alt={item.name}
                             width={80}
                             height={80}
@@ -99,6 +105,7 @@ const CartPage = () => {
                     ))}
                   </div>
 
+                  {/* Cart Summary */}
                   <div className="card-footer bg-white border-top p-4">
                     <div className="d-flex justify-content-between mb-3">
                       <span>Subtotal:</span>
@@ -119,7 +126,7 @@ const CartPage = () => {
                       <button
                         className="btn btn-outline-danger py-2"
                         onClick={() => {
-                          if(window.confirm('Are you sure you want to clear your cart?')) {
+                          if (window.confirm('Are you sure you want to clear your cart?')) {
                             emptyCart();
                           }
                         }}
