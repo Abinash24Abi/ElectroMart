@@ -12,6 +12,9 @@ import {
   FiPercent
 } from 'react-icons/fi';
 
+// ✅ Base URL configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://electromart-l51h.onrender.com";
+
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -27,7 +30,7 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get(`${API_BASE_URL}/api/products`);
       setProducts(response.data);
       setFilteredProducts(response.data);
       setLoading(false);
@@ -227,8 +230,9 @@ const ProductList = () => {
           <div className="col" key={product._id}>
             <div className="card h-100 shadow-sm border-0">
               <div className="position-relative">
+                {/* ✅ Use API_BASE_URL for images */}
                 <img
-                  src={`http://localhost:5000${product.imageUrl}`}
+                  src={`${API_BASE_URL}${product.imageUrl}`}
                   className="card-img-top p-3 bg-light"
                   alt={product.name}
                   style={{ height: '200px', objectFit: 'contain' }}
