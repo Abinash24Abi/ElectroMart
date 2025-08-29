@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Form, Button, Table, Card, Spinner, Alert, Modal ,Row,Col} from "react-bootstrap";
-import { FiEdit, FiTrash2, FiUpload, FiPlus, FiX } from "react-icons/fi";
+import { Container, Form, Button, Table, Card, Spinner, Alert, Modal, Row, Col } from "react-bootstrap";
+import { FiEdit, FiTrash2, FiPlus, FiX } from "react-icons/fi";
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://electromart-l51h.onrender.com";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({ 
-    name: "", 
-    brand: "", 
-    category: "", 
-    price: "", 
-    discount: 0, 
-    stock: 0 
+    name: "", brand: "", category: "", price: "", discount: 0, stock: 0 
   });
   const [file, setFile] = useState(null);
   const [editId, setEditId] = useState(null);
@@ -24,7 +21,7 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get(`${API_BASE_URL}/api/products`);
       setProducts(res.data);
       setError(null);
     } catch (err) {
@@ -44,26 +41,17 @@ const AdminProducts = () => {
       setLoading(true);
       
       const formData = new FormData();
-      formData.append("name", form.name);
-      formData.append("brand", form.brand);
-      formData.append("category", form.category);
-      formData.append("price", form.price);
-      formData.append("discount", form.discount);
-      formData.append("stock", form.stock);
+      Object.keys(form).forEach(key => formData.append(key, form[key]));
       if (file) formData.append("image", file);
 
       if (editId) {
-        await axios.put(
-          `http://localhost:5000/api/products/${editId}`, 
-          formData, 
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
+        await axios.put(`${API_BASE_URL}/api/products/${editId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
       } else {
-        await axios.post(
-          "http://localhost:5000/api/products", 
-          formData, 
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
+        await axios.post(`${API_BASE_URL}/api/products`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
       }
 
       resetForm();
@@ -93,7 +81,7 @@ const AdminProducts = () => {
     });
     setEditId(product._id);
     if (product.imageUrl) {
-      setImagePreview(`http://localhost:5000${product.imageUrl}`);
+      setImagePreview(`${API_BASE_URL}${product.imageUrl}`);
     }
   };
 
@@ -103,9 +91,7 @@ const AdminProducts = () => {
     
     if (selectedFile) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
+      reader.onloadend = () => setImagePreview(reader.result);
       reader.readAsDataURL(selectedFile);
     } else {
       setImagePreview(null);
@@ -120,7 +106,7 @@ const AdminProducts = () => {
   const handleDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:5000/api/products/${productToDelete._id}`);
+      await axios.delete(`${API_BASE_URL}/api/products/${productToDelete._id}`);
       fetchProducts();
       setShowDeleteModal(false);
     } catch (err) {
@@ -138,6 +124,7 @@ const AdminProducts = () => {
 
       {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
 
+      {/* --- Product Form --- */}
       <Card className="mb-5 shadow-sm">
         <Card.Body>
           <Form onSubmit={handleSubmit}>
@@ -264,6 +251,7 @@ const AdminProducts = () => {
         </Card.Body>
       </Card>
 
+      {/* --- Product Table --- */}
       <Card className="shadow-sm">
         <Card.Body>
           <div className="d-flex justify-content-between align-items-center mb-4">
@@ -296,7 +284,7 @@ const AdminProducts = () => {
                       <td>
                         {product.imageUrl && (
                           <img 
-                            src={`http://localhost:5000${product.imageUrl}`} 
+                            src={`${API_BASE_URL}${product.imageUrl}`} 
                             alt={product.name} 
                             style={{ width: '50px', height: '50px', objectFit: 'contain' }} 
                             className="rounded"
@@ -338,7 +326,7 @@ const AdminProducts = () => {
         </Card.Body>
       </Card>
 
-      {/* Delete Confirmation Modal */}
+      {/* --- Delete Confirmation Modal --- */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
